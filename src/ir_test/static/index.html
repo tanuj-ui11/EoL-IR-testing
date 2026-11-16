@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IR Test Station</title>
+<style>
+:root{--bg:#f4f5f7;--card:#fff;--ink:#1c2430;--mute:#667085;--line:#d9dde3;--pass:#12803c;--fail:#c4261d;--warn:#b25e00;--accent:#1b5fd1;--idle:#98a2b3}
+@media (prefers-color-scheme:dark){:root{--bg:#12161c;--card:#1b222b;--ink:#e8ecf2;--mute:#9aa4b2;--line:#2e3846;--pass:#3ecf74;--fail:#ff6b61;--warn:#ffb044;--accent:#6aa3ff;--idle:#5b6676}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,sans-serif}
+header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--card)}
+header h1{font-size:18px;margin:0}.mute{color:var(--mute);font-size:14px}
+main{display:grid;gap:16px;padding:16px;max-width:1100px;margin:auto;grid-template-columns:320px 1fr}
+@media(max-width:800px){main{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
+.card h2{font-size:15px;margin:0 0 12px;text-transform:uppercase;letter-spacing:.04em;color:var(--mute)}
+label{display:block;font-size:14px;margin:10px 0 4px}
+input[type=text],input[type=number],select{width:100%;padding:10px;font-size:16px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+button{font-size:16px;padding:12px 16px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;min-height:44px}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+button.danger{color:var(--fail);border-color:var(--fail)}button:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}.row>*{flex:1}
+.banner{margin-bottom:12px;padding:16px;border-radius:10px;font-size:22px;font-weight:700;text-align:center;border:2px solid}
+.banner.PASS{color:var(--pass);border-color:var(--pass)}.banner.FAIL{color:var(--fail);border-color:var(--fail)}.banner.ABORT{color:var(--warn);border-color:var(--warn)}
+.steps{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:8px}
+.steps li{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:8px}
+.dot{width:14px;height:14px;border-radius:50%;background:var(--idle);flex:none}
+.dot.PASS{background:var(--pass)}.dot.FAIL{background:var(--fail)}.dot.cur{background:var(--accent)}
+.steps li.cur{border-color:var(--accent);border-width:2px}
+.params{display:flex;gap:16px;margin:8px 0}.params b{display:block;font-size:22px}
+.hv{display:flex;gap:10px;align-items:flex-start;border:2px solid var(--warn);border-radius:8px;padding:10px;margin:12px 0;color:var(--warn);font-weight:600}
+.lid{display:flex;gap:10px;align-items:center;margin:12px 0;font-size:17px}.lid input{width:22px;height:22px}
+.err{color:var(--fail);font-weight:600;min-height:1.4em;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+td.PASS{color:var(--pass);font-weight:700}td.FAIL{color:var(--fail);font-weight:700}td.ABORT{color:var(--warn);font-weight:700}
+.wide{grid-column:1/-1}.hide{display:none}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+</style></head><body>
+<header><h1>Charger IR / Hipot Test</h1><span class="mute" id="inst"></span></header>
+<main>
+ <section class="card" aria-label="New test">
+  <h2>New test</h2>
+  <label for="serial">Charger serial</label><input id="serial" type="text" autocomplete="off" autofocus>
+  <label for="op">Operator</label><input id="op" type="text" autocomplete="off">
+  <label for="recipe">Recipe</label><select id="recipe"></select>
+  <div class="row"><button class="primary" id="start">Start test</button></div>
+  <div class="err" id="err0" role="alert"></div>
+ </section>
+ <section class="card" aria-label="Active test" aria-live="polite">
+  <h2>Active test</h2>
+  <div id="idle" class="mute">Enter a serial number and start a test.</div>
+  <div id="active" class="hide">
+   <div id="banner" class="banner hide"></div>
+   <ul class="steps" id="steps"></ul>
+   <div id="stepcard">
+    <p id="instr"></p>
+    <div class="params"><div class="mute">Voltage<b id="pv"></b></div><div class="mute">Time<b id="pt"></b></div><div class="mute">Trip limit<b id="pl"></b></div></div>
+    <div class="hv">&#9889; HIGH VOLTAGE. Gloves on, mat in place. Never touch the charger or leads while the red lamp is lit.</div>
+    <label class="lid"><input type="checkbox" id="lid"><span id="lidtxt">Lid closed and interlock lit</span></label>
+    <div id="man" class="hide">
+     <label for="ma">Leakage read from CC2670P (mA)</label><input id="ma" type="number" step="0.001" min="0" inputmode="decimal">
+     <label class="lid"><input type="checkbox" id="bd"><span>Breakdown / tester alarm tripped</span></label>
+     <div class="row"><button class="primary" id="rec">Record reading</button></div>
+    </div>
+    <div id="auto" class="row hide"><button class="primary" id="runb">Run step</button></div>
+   </div>
+   <div class="row"><button class="danger" id="abort">Abort</button><button id="again" class="hide">Next charger</button></div>
+   <div class="err" id="err1" role="alert"></div>
+  </div>
+ </section>
+ <section class="card wide" aria-label="History"><h2>Recent results</h2>
+  <table><thead><tr><th>Finished</th><th>Serial</th><th>Verdict</th><th>Worst leakage (mA)</th></tr></thead><tbody id="hist"></tbody></table></section>
+</main>
+<script>
+const $=id=>document.getElementById(id);let S=null,lastKey='';
+async function api(p,body){const r=await fetch(p,body===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const j=await r.json();if(!r.ok)throw new Error(j.error||r.status);return j}
+function fail(e,id='err1'){$(id).textContent=e.message}
+async function refresh(){S=await api('/api/state');render();hist()}
+function render(){
+ $('inst').textContent=S.instrument+' · '+S.station_id;
+ if(!$('recipe').options.length)S.recipes.forEach(r=>$('recipe').add(new Option(r.name,r.id)));
+ const s=S.session;$('idle').classList.toggle('hide',!!s);$('active').classList.toggle('hide',!s);
+ $('err0').textContent='';
+ if(!s)return;
+ const rec=s.record,steps=s.recipe.steps;
+ $('steps').innerHTML=steps.map((st,i)=>{const r=rec.steps[i];const c=r?r.verdict:(i===s.index&&!s.finished?'cur':'');
+  return `<li class="${c==='cur'?'cur':''}"><span class="dot ${c}"></span><div><strong>${st.title}</strong><div class="mute">${st.voltage_v} V · ${st.dwell_s} s · limit ${st.trip_ma} mA${r?` · measured ${r.leakage_ma} mA${r.breakdown?' (BREAKDOWN)':''}`:''}</div></div></li>`}).join('');
+ const b=$('banner');b.classList.toggle('hide',!s.finished);if(s.finished){b.className='banner '+rec.verdict;b.textContent=rec.serial+' — '+rec.verdict}
+ $('stepcard').classList.toggle('hide',s.finished);$('abort').classList.toggle('hide',s.finished);$('again').classList.toggle('hide',!s.finished);
+ if(!s.finished){const st=steps[s.index];$('instr').textContent=st.instruction;$('pv').textContent=st.voltage_v+' V';$('pt').textContent=st.dwell_s+' s';$('pl').textContent=st.trip_ma+' mA';
+  $('man').classList.toggle('hide',!S.manual);$('auto').classList.toggle('hide',S.manual);
+  $('lid').checked=S.lid_closed;$('lid').disabled=S.hw_interlock;
+  $('lidtxt').textContent=S.hw_interlock?'Lid interlock (hardware): '+(S.lid_closed?'closed':'OPEN'):'Lid closed and interlock lit';
+  if(lastKey!==s.record.started_at+':'+s.index){lastKey=s.record.started_at+':'+s.index;$('ma').value='';$('bd').checked=false;$('err1').textContent=''}}
+}
+async function hist(){const h=await api('/api/history');$('hist').innerHTML=h.map(r=>`<tr><td>${r.finished_at.replace('T',' ').slice(0,19)}</td><td>${r.serial}</td><td class="${r.verdict}">${r.verdict}</td><td>${Math.max(0,...r.steps.map(x=>x.leakage_ma))}</td></tr>`).join('')||'<tr><td colspan=4 class="mute">No results yet</td></tr>'}
+$('start').onclick=async()=>{try{S=await api('/api/start',{recipe:$('recipe').value,serial:$('serial').value,operator:$('op').value});render()}catch(e){fail(e,'err0')}};
+$('serial').onkeydown=e=>{if(e.key==='Enter')$('start').click()};
+$('lid').onchange=async()=>{S=await api('/api/lid',{closed:$('lid').checked});render()};
+$('rec').onclick=async()=>{try{S=await api('/api/measurement',{leakage_ma:$('ma').value,breakdown:$('bd').checked});render();hist()}catch(e){fail(e)}};
+$('runb').onclick=async()=>{try{S=await api('/api/run',{});render();hist()}catch(e){fail(e)}};
+$('abort').onclick=async()=>{try{S=await api('/api/abort',{});render();hist()}catch(e){fail(e)}};
+$('again').onclick=()=>{S.session=null;render();$('serial').value='';$('serial').focus()};
+refresh();
+</script></body></html>

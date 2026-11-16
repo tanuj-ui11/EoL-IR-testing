@@ -1,0 +1,18 @@
+{
+  "id": "charger_class1",
+  "name": "Class I charger - dielectric withstand (CONFIRM VALUES vs product standard)",
+  "steps": [
+    {
+      "id": "LN_PE",
+      "title": "Input (L+N shorted) to earth / metal case",
+      "instruction": "Plug the charger into the fixture socket (L and N are shorted inside it). Connect the HV probe to the L+N post and the return clip to the earth/case post.",
+      "voltage_v": 1500, "dwell_s": 2, "trip_ma": 5.0
+    },
+    {
+      "id": "LN_OUT",
+      "title": "Input (L+N shorted) to DC output",
+      "instruction": "Keep the plug in the socket. Connect the HV probe to the L+N post and the return clip to BOTH output leads clipped together (blue + black).",
+      "voltage_v": 3000, "dwell_s": 2, "trip_ma": 5.0
+    }
+  ]
+}
