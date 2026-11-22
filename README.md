@@ -42,3 +42,4 @@ against your product safety standard before use.**
 - `docs/03-mat-spec.md`: insulating mat requirements
 - `docs/04-eol-integration.md`: how this plugs into the EOL GUI later
 - `docs/05-station-kiosk.md`: monitor/Pi/scanner mounting on the line frame, browser kiosk, scan forwarding to ops.leanwatts.com
+- `docs/06-bill-of-materials.csv`: per-station parts list with sellers, links and prices

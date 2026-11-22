@@ -18,8 +18,7 @@ and to the IR test station. Software: `kiosk/` (browser kiosk) and `src/scan_for
 the enclosure. Power the Pi from the station's earthed supply. Nothing in this kit replaces the hardware interlock
 (see `01-test-procedure-and-safety.md`).
 
-Prices in the earlier proposal (Pi, VESA bracket, Newland FM3280 / Symcode scanners) have not been checked here.
-Get quotes before ordering.
+Parts list with sellers and prices: `docs/06-bill-of-materials.csv`. Prices are from public listings (Nov 2026), not quotes.
 
 ## Getting scans into ops.leanwatts.com: pick ONE option per station
 
