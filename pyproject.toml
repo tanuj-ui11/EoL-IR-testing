@@ -1,7 +1,7 @@
 [project]
 name = "ir-test"
 version = "0.1.0"
-description = "End-of-line insulation / dielectric withstand test station for chargers (CC2670P hipot)"
+description = "End-of-line insulation / dielectric withstand test station for chargers (CC2670P hipot), plus line-side scan forwarder"
 requires-python = ">=3.10"
 dependencies = []
 
@@ -10,6 +10,7 @@ dev = ["pytest"]
 
 [project.scripts]
 ir-test = "ir_test.server:main"
+scan-forwarder = "scan_forwarder.cli:main"
 
 [build-system]
 requires = ["setuptools>=68"]

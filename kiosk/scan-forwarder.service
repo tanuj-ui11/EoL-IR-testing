@@ -1,0 +1,23 @@
+[Unit]
+Description=Barcode scanner -> webhook forwarder
+After=network-online.target
+Wants=network-online.target
+# Only one forwarder per scanner; restart picks the scanner up again after it is unplugged.
+StartLimitIntervalSec=0
+
+[Service]
+EnvironmentFile=/etc/scan-forwarder.env
+ExecStart=/opt/eol-station/venv/bin/python -m scan_forwarder --device ${SCANNER_DEVICE}
+Restart=always
+RestartSec=3
+DynamicUser=yes
+SupplementaryGroups=input dialout
+StateDirectory=scan-forwarder
+Environment=SCAN_SPOOL=/var/lib/scan-forwarder/queue.jsonl
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

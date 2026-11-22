@@ -10,6 +10,7 @@ Three deliverables:
 | Operator GUI + result logging | `src/ir_test/`, `recipes/` | Working; 8 unit tests + browser run pass (manual + simulator modes) |
 | Interlocked test enclosure | `hardware/enclosure/`, `docs/02-enclosure.md` | **Draft, not rendered or measured.** Charger size is estimated from a photo |
 | Non-conducting mat | `docs/03-mat-spec.md` | Spec only. The existing green mat's rating is unknown |
+| Line-side kiosk + scanner forwarder | `kiosk/`, `src/scan_forwarder/`, `docs/05-station-kiosk.md` | Forwarder tested against a local webhook; Pi setup script **not yet run on a real Pi**. LeanWatts endpoint unknown |
 
 ## Important: what this instrument actually measures
 
@@ -40,3 +41,4 @@ against your product safety standard before use.**
 - `docs/02-enclosure.md`: enclosure concept, cut list, interlock wiring
 - `docs/03-mat-spec.md`: insulating mat requirements
 - `docs/04-eol-integration.md`: how this plugs into the EOL GUI later
+- `docs/05-station-kiosk.md`: monitor/Pi/scanner mounting on the line frame, browser kiosk, scan forwarding to ops.leanwatts.com
